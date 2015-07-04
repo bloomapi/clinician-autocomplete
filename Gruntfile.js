@@ -28,12 +28,12 @@ module.exports = function(grunt) {
 				banner: "<%= meta.banner %>"
 			},
 			dist: {
-				src: ["src/autocomplete.js", "build/autocomplete-css.js"],
+				src: ["dist/<%= file.name %>.js"],
 				dest: "dist/<%= file.name %>.js"
 			}
 		},
 
-    //minifies and cleanup out inline CSS
+		//minifies and cleanup out inline CSS
 		cssmin: {
 		  target: {
 		    files: {
@@ -41,17 +41,6 @@ module.exports = function(grunt) {
 		    }
 		  }
 		},
-
-		//Wraps up our CSS so we can inject it into the JS
-	  "file-creator": {
-	    basic : {
-	      "build/autocomplete-css.js": function(fs, fd, done) {
-	      	var css = grunt.file.read('build/autocomplete.min.css');
-	        fs.writeSync(fd, "var autocompleteCss = '" + css + "';");
-	        done();
-	      }
-	    }
-	  },
 
 		// Lint definitions
 		jshint: {
@@ -73,47 +62,65 @@ module.exports = function(grunt) {
 			}
 		},
 
-    aws: grunt.file.readJSON("credentials.json"),
+		aws: grunt.file.readJSON("credentials.json"),
 
-    s3: {
-      options: {
-        accessKeyId: "<%= aws.accessKeyId %>",
-        secretAccessKey: "<%= aws.secretAccessKey %>",
-        bucket: "cdn.bloomapi.com"
-      },
-      build: {
-        cwd: "dist/",
-        src: "*.js",
-        dest: "assets/js/"
-      },
-      xww: {
-	      cwd: "src/",
-      	src: "powered_by_bloom_on_white.png",
-      	dest: "assets/img/"
-      }
-    },
+		s3: {
+		  options: {
+		    accessKeyId: "<%= aws.accessKeyId %>",
+		    secretAccessKey: "<%= aws.secretAccessKey %>",
+		    bucket: "cdn.bloomapi.com"
+		  },
+		  js: {
+		    cwd: "dist/",
+		    src: "*.js",
+		    dest: "assets/js/"
+		  },
+		  img: {
+		    cwd: "src/",
+		  	src: "powered_by_bloom_on_white.png",
+		  	dest: "assets/img/"
+		  }
+		},
 
 		//Clean up the mess
 		clean: ["dist/*", "build/*"],
+
+		'string-replace': {
+		  dist: {
+		    files: {
+		      'dist/<%= file.name %>.js': 'src/*.js',
+		    },
+		    options: {
+		      replacements: [
+		        // place files inline example 
+		        {
+		          pattern: 'AUTOCOMPLETE_CSS',
+		          replacement: "<%= grunt.file.read('build/autocomplete.min.css') %>"
+		        }
+		      ]
+		    }
+		  }
+		},
 
 		//watch src for changes.
 		watch: {
 		    files: ['src/*'],
 		    tasks: ['default']
 		}
-
 	});
+
 
 	grunt.loadNpmTasks("grunt-contrib-concat");
 	grunt.loadNpmTasks("grunt-contrib-jshint");
 	grunt.loadNpmTasks("grunt-contrib-uglify");
 	grunt.loadNpmTasks("grunt-contrib-watch");
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
-	grunt.loadNpmTasks('grunt-file-creator');
 	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-aws');
+	grunt.loadNpmTasks('grunt-string-replace');
 
-	grunt.registerTask("build", [ "cssmin", "file-creator", "concat", "uglify"]);
+
+	grunt.registerTask("build", [ "cssmin", "string-replace", "concat", "uglify"]);
 	grunt.registerTask("default", ["jshint", "build"]);
 
 };

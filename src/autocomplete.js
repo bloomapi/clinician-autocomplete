@@ -136,9 +136,7 @@ var Autocomplete = (function() {
     }
 
     var defaults = {     
-      // bloomURI : 'http://192.168.2.1:3000/api/',
-      bloomURI : 'http://127.0.0.1:3000/api/',
-      // bloomURI : 'https://www.bloomapi.com/api/',
+      bloomURI : 'https://www.bloomapi.com/api/',
       limit : 5,
       highlight : true,
       enableGeoLocation : true,

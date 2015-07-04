@@ -1,0 +1,50 @@
+{
+  "name": "clinician-autocomplete",
+  "version": "0.0.1",
+  "description": "A drop in autocomplete widget to speed up sign up and picking a clinician.",
+  "keywords": [
+    "autocomplete",
+    "javascript",
+    "widget",
+    "plugins"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bloomapi/clinician-autocomplete.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bloomapi/clinician-autocomplete/issues"
+  },
+  "author": {
+    "name": "Nick Lane-Smith",
+    "email": "nick@bloomapi.com",
+    "url": "https://github.com/nickls"
+  },
+  "homepage": "https://www.bloomapi.com/",
+  "contributors": [
+    {
+      "name": "Nick Lane-Smith",
+      "email": "nick@bloomapi.com",
+      "url": "https://github.com/nickls"
+    },
+    {
+      "name": "Michael Wasser",
+      "email": "michael@bloomapi.com",
+      "url": "https://github.com/untoldone"
+    }
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "grunt": "~0.4.5",
+    "grunt-aws": "^0.5.4",
+    "grunt-cli": "~0.1.13",
+    "grunt-contrib-clean": "^0.6.0",
+    "grunt-contrib-concat": "^0.5.1",
+    "grunt-contrib-csslint": "^0.4.0",
+    "grunt-contrib-cssmin": "^0.12.3",
+    "grunt-contrib-jshint": "^0.11.0",
+    "grunt-contrib-uglify": "^0.8.0",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-file-creator": "^0.1.3"
+  }
+}

@@ -1,0 +1,103 @@
+.cac-selectable {
+  cursor: pointer;
+}
+
+.cac-suggestion {
+  border-top: 2px solid #f5f5f5;
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.2;
+
+}
+
+.cac-highlight {
+  background-color: rgba(153, 181, 144, 0.5);
+}
+
+.cac-header {
+  text-align: left;
+  background-color: rgb(191, 190, 192);
+  font-size: 13px;
+  padding-top: 5px;
+  padding-left: 5px;
+}
+
+.cac-result {
+  position: relative;
+  padding: 8px;
+}
+
+.cac-details {
+  display:inline-block;
+  min-height: 80px;
+  padding-top: 5px;
+  padding-left: 5px;
+  width: 50%;
+}
+
+.cac-first-name, .cac-last-name {
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: bold;
+}
+
+.cac-speciality {
+  font-size:16px
+}
+
+.cac-address {
+  color: darkgrey;
+  font-size: 16px;
+  float: right;
+  width: 50%;
+  text-align: center;
+  padding-top: 5px;
+  padding-top: 5px;
+  padding-right: 5px;
+}
+
+.cac-identifier {
+  font-size: 12px;
+  padding-top:20px;
+}
+
+.cac-cursor,
+.cac-result:hover,
+.cac-result.is-active {
+  background: rgba(153, 181, 144, 0.15);
+}
+
+.cac-dropdown-menu {
+  position: relative;
+  height: 100%;
+  top: 0px;
+  left: 0px; 
+  z-index: 100;
+  margin-bottom: 20px;
+  overflow: hidden;
+  background-color: #fff;
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 0px 1px green;
+  -webkit-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  -moz-box-shadow: 0 5px 10px rgba(0,0,0,.2);
+  box-shadow: 0 5px 10px rgba(0,0,0,.2);
+}
+
+.cac-dropdown-menu:after {
+  content: "";
+  padding: 1px 1px 1px 0;
+  height: 16px;
+  text-align: right;
+  display: block;
+  background-image: url(https://s3.amazonaws.com/cdn.bloomapi.com/assets/img/powered_by_bloom_on_white.png);
+  background-position: right;
+  background-repeat: no-repeat;
+  background-size: 120px 16px;
+}
+
+.no-results-message {
+  padding: 10px 0;
+  font-size: 16px;
+}

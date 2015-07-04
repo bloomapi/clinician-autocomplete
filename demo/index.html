@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Clinician Autocomplete Demo</title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <style type="text/css">
+    .autocomplete {
+      position: relative;
+      background-color: #f5f5f5;
+      outline: none;
+      width: 450px;
+      padding: 5px 8px;
+      font-size: 24px;
+      line-height: 30px;
+      border: 2px solid #99b590;
+      -webkit-border-radius: 8px;
+      -moz-border-radius: 8px;
+      border-radius: 8px;
+    }
+    .container {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div id='discovery-demo' class="container">
+    <h2 class="title">Clinician Autocomplete Demo</h2>
+    <p class="tagline">Using our typeahead widget a clinician can find themselves and signup for your service in under 20 seconds. It can also be used by patients to lookup their providers.</p>
+    <input id="autocomplete" type="text" placeholder="Search Clinicians ...">
+  </div>
+
+
+  <script type="text/javascript" src="../dist/autocomplete-0.0.1.js"></script>
+  <script type="text/javascript">
+      var autocomplete = new Autocomplete((document.getElementById('autocomplete')), {
+        apiKey: 'XXXXXXX', //Get your api key here: https://www.bloomapi.com/signup
+        distance: 25
+      }).on('select', function(ev, selected){
+        console.log("selected: " + selected.npi);
+      });
+  </script>
+</body>
+</html>

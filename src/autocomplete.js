@@ -1,4 +1,4 @@
-/*exported Autocomplete, i */
+/*exported Autocomplete */
 
 /*
  * autocomplete.js
@@ -37,63 +37,9 @@ if (!Array.prototype.forEach) {
   };
 }  
 
-// XXX move Utils elsewhere 
-var _ = (function() {
-  'use strict';
-
-  return {
-    isMsie: function() {
-      // from https://github.com/ded/bowser/blob/master/bowser.js
-      return (/(msie|trident)/i).test(navigator.userAgent) ?
-        navigator.userAgent.match(/(msie |rv:)(\d+(.\d+)?)/i)[2] : false;
-    },
-    error: function(err) { console.log(err);},
-    //shallow merge
-    smerge: function(obj1, obj2) {
-      var key, obj3 = {};
-      for (key in obj1) { obj3[key] = obj1[key]; }
-      for (key in obj2) { obj3[key] = obj2[key]; }
-      return obj3;
-    },
-    isEmpty: function(obj) { 
-      for(var p in obj) {
-        if(obj.hasOwnProperty(p)) {
-          return false;
-        }
-        return true;
-      }
-    },
-    addClass: function(node, mclass) {
-      var classList = node.className.split(/\s/);
-      classList.push(mclass);
-      node.className = classList.join(' ');
-    },
-    removeClass: function(node, mclass) {
-      var classList = node.className.split(/\s/);
-      for (var i in classList) {
-        if (classList[i] === mclass) {
-          classList.splice(i, 1);
-        }
-      }
-      node.className = classList.join(' ');
-    },
-    encodeQueryData: function(data) {
-      var ret = [];
-      for (var d in data) {
-        ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
-      }
-      return ret.join('&');
-    },
-    forEach: function(fakeArray, cb) {
-      Array.prototype.slice.call(fakeArray).forEach(cb);
-    }
-  };
-})();
-
 var Autocomplete = (function() {
   'use strict';
 
-  //XXX move this elsewhere.
   var keyCodeMap = {
     TAB: 9,
     ESCAPE: 27,
@@ -104,12 +50,62 @@ var Autocomplete = (function() {
     ENTER: 13
   };
 
-
   var cacEvents = {
     open: 'open',
     close: 'close',
     select: 'select'
   };
+
+  var _ = (function() {
+
+    return {
+      isMsie: function() {
+        // from https://github.com/ded/bowser/blob/master/bowser.js
+        return (/(msie|trident)/i).test(navigator.userAgent) ?
+          navigator.userAgent.match(/(msie |rv:)(\d+(.\d+)?)/i)[2] : false;
+      },
+      error: function(err) { console.log(err);},
+      //shallow merge
+      smerge: function(obj1, obj2) {
+        var key, obj3 = {};
+        for (key in obj1) { obj3[key] = obj1[key]; }
+        for (key in obj2) { obj3[key] = obj2[key]; }
+        return obj3;
+      },
+      isEmpty: function(obj) { 
+        for(var p in obj) {
+          if(obj.hasOwnProperty(p)) {
+            return false;
+          }
+          return true;
+        }
+      },
+      addClass: function(node, mclass) {
+        var classList = node.className.split(/\s/);
+        classList.push(mclass);
+        node.className = classList.join(' ');
+      },
+      removeClass: function(node, mclass) {
+        var classList = node.className.split(/\s/);
+        for (var i in classList) {
+          if (classList[i] === mclass) {
+            classList.splice(i, 1);
+          }
+        }
+        node.className = classList.join(' ');
+      },
+      encodeQueryData: function(data) {
+        var ret = [];
+        for (var d in data) {
+          ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
+        }
+        return ret.join('&');
+      },
+      forEach: function(fakeArray, cb) {
+        Array.prototype.slice.call(fakeArray).forEach(cb);
+      }
+    };
+  })();
 
   // Constructor
   // ===========
@@ -135,7 +131,7 @@ var Autocomplete = (function() {
       _.error('missing api key, https://www.bloomapi.com/documentation/XXX');
     }
 
-    var defaults = {     
+    var defaults = {
       bloomURI : 'https://www.bloomapi.com/api/',
       limit : 5,
       highlight : true,
@@ -155,6 +151,9 @@ var Autocomplete = (function() {
 
     // Setup
     // ====================
+
+    var autocompleteCss = 'AUTOCOMPLETE_CSS';
+
     var head = document.head || document.getElementsByTagName('head')[0];
     var style = document.createElement('style');
     style.type = 'text/css';

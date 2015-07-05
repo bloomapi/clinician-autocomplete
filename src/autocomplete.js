@@ -2,7 +2,7 @@
 
 /*
  * autocomplete.js
- * https://github.com/nickls/autocomplete.js
+ * https://github.com/bloomapi/clinician-autocomplete
  * Copyright 2015 BloomAPI, Inc.; Licensed MIT
  */
 

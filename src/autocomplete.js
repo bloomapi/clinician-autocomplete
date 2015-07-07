@@ -128,7 +128,7 @@ var Autocomplete = (function() {
     }
 
     if(!o.apiKey) {
-      _.error('missing api key, https://www.bloomapi.com/documentation/XXX');
+      _.error('missing api key, https://www.bloomapi.com/documentation/clinician-identity/#customization');
     }
 
     var defaults = {
@@ -386,7 +386,6 @@ var Autocomplete = (function() {
       //Add header to menu, must be added first
       var header = templateToDocumentFragment(headerTemplate);
       fillTemplate(this.classPrefix, header, {zip : this.zipcode});
-      console.log(header.childNodes[0]);
       this.menu.appendChild(header);
     }
 

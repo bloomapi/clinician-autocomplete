@@ -403,7 +403,7 @@ var Autocomplete = (function() {
   };
 
   Autocomplete.prototype._getPredictions = function() {
-    var query = this.options.bloomURI + 'clinician-identity/discovery';
+    var query = this.options.bloomURI + 'clinician-identity/autocomplete';
     var that = this;
 
     var params = {
@@ -426,7 +426,11 @@ var Autocomplete = (function() {
     }, 200);
 
     function onResponse(err, data) {
-      that._populateMenu(data);
+      if (err || !data || _.isEmpty(data) || !('results' in data)) {
+        that._populateMenu([]);
+      } else {
+        that._populateMenu(data.results);
+      }
     }
   };
 
@@ -437,13 +441,14 @@ var Autocomplete = (function() {
     var that = this;
 
     var query = this.options.bloomURI + 'clinician-identity/location';
+    query += '?' + _.encodeQueryData({secret: this.options.apiKey});
     return this._getJSONP(query, onResponse.bind(this));
 
     function onResponse(err, data) {
-      if (err || !data || _.isEmpty(data) || !('zipcode' in data)) {
+      if (err || !data || _.isEmpty(data) || !('result' in data) || !('zipcode' in data.result)) {
         return cb(null);
       }
-      that.zipcode = data.zipcode;
+      that.zipcode = data.result.zipcode;
       return cb(that.zipcode);
     }
   };

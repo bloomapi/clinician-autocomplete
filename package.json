@@ -1,6 +1,6 @@
 {
   "name": "clinician-autocomplete",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A drop in autocomplete widget to speed up sign up and picking a clinician.",
   "keywords": [
     "autocomplete",

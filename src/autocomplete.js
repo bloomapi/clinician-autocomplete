@@ -200,7 +200,11 @@ var Autocomplete = (function() {
   // Event Handlers
   // ====================
   Autocomplete.prototype._onClick = function(evt) {
-    var node = evt.srcElement.parentNode;
+    var target, node;
+
+    target = evt.target || evt.srcElement;
+    node = target.parentNode;
+
     //from click, bubble up looking for selectable
     while(node !== document && !node.hasAttribute('data-cac-id')) {
       node = node.parentNode;
@@ -267,7 +271,8 @@ var Autocomplete = (function() {
 
   Autocomplete.prototype._onInput = function(evt) {
     //user deleted all the input text, hide the menu
-    if (evt.srcElement.value.length === 0) {
+    var target = evt.target || evt.srcElement;
+    if (target.value.length === 0) {
       this._closeMenu();
       return;
     }
@@ -324,7 +329,11 @@ var Autocomplete = (function() {
         if(typeof data[key] === "object") {
           fillTemplate(prefix, r, data[key]);
         } else {
-          r.innerText = data[key];              
+          if('textContent' in document.body) {
+            r.textContent = data[key];
+          } else {
+            r.innerText = data[key];
+          }
         }
       }
     }

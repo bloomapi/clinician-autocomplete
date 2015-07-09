@@ -412,7 +412,13 @@ var Autocomplete = (function() {
     }
 
     if (currWinWidth !== this.winWidth || currWinHeight !== this.winHeight) {
-      this.input.blur();
+      //probably IE8
+      if (window.innerHeight == null) {
+        //reposition menu rather than blur as IE8 calls resize more often than it actually does
+        this._openMenu();
+      } else {
+        this.input.blur();
+      }
       this.winHeight = currWinHeight;
       this.winWidth = currWinWidth;
     }

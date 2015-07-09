@@ -163,10 +163,6 @@ var Autocomplete = (function() {
     this.classPrefix = 'cac';
     this.selectionId = 'data-cac-id';
 
-    // to help reverse compat with window resizing
-    this.winHeight = window.innerHeight || document.documentElement.clientHeight;
-    this.winWidth = window.innerWidth || document.documentElement.clientWidth;
-
     // Setup
     // ====================
 
@@ -312,6 +308,8 @@ var Autocomplete = (function() {
     } else {
       window.attachEvent('onresize', this._resizeHandler);
     }
+
+    this._getPredictions();
   };
 
   Autocomplete.prototype._onInputBlur = function() {
@@ -325,7 +323,7 @@ var Autocomplete = (function() {
       window.detachEvent('onresize', this._resizeHandler);
     }
 
-    this._closeMenu();
+    setTimeout(this._closeMenu.bind(this), 200);
 
     this._resizeHandler = null;
   };
@@ -395,6 +393,13 @@ var Autocomplete = (function() {
   Autocomplete.prototype._handleResize = function() {
     var currWinHeight = window.innerHeight || document.documentElement.clientHeight;
     var currWinWidth = window.innerWidth || document.documentElement.clientWidth;
+
+    if (this.winWidth == null) {
+      this.winHeight = currWinHeight;
+      this.winWidth = currWinWidth;
+
+      return;
+    }
 
     if (currWinWidth !== this.winWidth || currWinHeight !== this.winHeight) {
       this.input.blur();

@@ -189,15 +189,14 @@ var Autocomplete = (function() {
     
     //User Input Events
     if (!_.isMsie() || _.isMsie() > 8) {
-      this.input.addEventListener('keydown', this._onKeydown.bind(this), false);
-      this.input.addEventListener('input', this._onInput.bind(this), false);
+      this.input.addEventListener('keydown', this._onKeyDown.bind(this), false);
+      this.input.addEventListener('input', this._onInputChange.bind(this), false);
       this.input.addEventListener('focus', this._onInputFocus.bind(this), false);
       this.input.addEventListener('blur', this._onInputBlur.bind(this), false);
       this.menu.addEventListener('click', this._onClick.bind(this), false);
     } else {
-      this.input.attachEvent('onkeydown', this._onKeydown.bind(this));
-      //ie doesn't support input.
-      this.input.attachEvent('onkeyup', this._onInput.bind(this));
+      this.input.attachEvent('onkeydown', this._onKeyDown.bind(this));
+      this.input.attachEvent('onkeyup', this._onInputChange.bind(this));
       this.input.attachEvent('onfocus', this._onInputFocus.bind(this));
       this.input.attachEvent('onblur', this._onInputBlur.bind(this));
       this.menu.attachEvent('onclick', this._onClick.bind(this));
@@ -234,16 +233,18 @@ var Autocomplete = (function() {
     }
   };
 
-  Autocomplete.prototype._onKeydown = function(evt) {
+  Autocomplete.prototype._onKeyDown = function (evt) {
     var keyName = evt.which || evt.keyCode;
     var node, suggestions, next;
+
     switch (keyName) {
       case keyCodeMap.ESCAPE:
         this._closeMenu();
+        evt.preventDefault ? evt.preventDefault() : evt.returnValue = false;
         break;
       case keyCodeMap.UP:
         node = this.menu.querySelector(".cac-cursor");
-        suggestions = Array.prototype.slice.call(this.menu.querySelectorAll('.cac-suggestion'));
+        suggestions = this.menu.querySelectorAll('.cac-suggestion');
 
         if (node) {
           next = (node.previousSibling && node.previousSibling.hasAttribute('data-cac-id') ? node.previousSibling : suggestions[suggestions.length - 1]);
@@ -251,12 +252,13 @@ var Autocomplete = (function() {
           _.addClass(next, 'cac-cursor');
         } else {
           //start at the end
-          _.addClass(suggestions[suggestions.length - 1], 'cac-cursor');
+          _.addClass(suggestions.item(suggestions.length - 1), 'cac-cursor');
         }
+        evt.preventDefault ? evt.preventDefault() : evt.returnValue = false;
         break;
       case keyCodeMap.DOWN:
         node = this.menu.querySelector(".cac-cursor");
-        suggestions = Array.prototype.slice.call(this.menu.querySelectorAll('.cac-suggestion'));
+        suggestions = this.menu.querySelectorAll('.cac-suggestion');
 
         if (node) {
           next = (node.nextSibling != null ? node.nextSibling : suggestions[0]);
@@ -264,8 +266,9 @@ var Autocomplete = (function() {
           _.addClass(next, 'cac-cursor');
         } else {
           //start at the beginging
-          _.addClass(suggestions[0], 'cac-cursor');
+          _.addClass(suggestions.item(0), 'cac-cursor');
         }
+        evt.preventDefault ? evt.preventDefault() : evt.returnValue = false;
         break;
       case keyCodeMap.TAB:
         // select first entry
@@ -273,7 +276,7 @@ var Autocomplete = (function() {
         if (node) {
           this._selectEntry(evt, node.getAttribute('data-cac-id'));
         }
-        evt.preventDefault();
+        evt.preventDefault ? evt.preventDefault() : evt.returnValue = false;
         break;
       case keyCodeMap.ENTER:
         //select current entry
@@ -281,21 +284,31 @@ var Autocomplete = (function() {
         if (node) {
           this._selectEntry(evt, node.getAttribute('data-cac-id'));
         }
-        evt.preventDefault();
+        evt.preventDefault ? evt.preventDefault() : evt.returnValue = false;
       break;
       default:
     }
   };
 
-  Autocomplete.prototype._onInput = function(evt) {
-    //user deleted all the input text, hide the menu
+  Autocomplete.prototype._onInputChange = function(evt) {
     var target = evt.target || evt.srcElement;
+    var keyName = evt.which || evt.keyCode;
+
+    switch (keyName) {
+      case keyCodeMap.ESCAPE:
+      case keyCodeMap.UP:
+      case keyCodeMap.DOWN:
+      case keyCodeMap.TAB:
+      case keyCodeMap.ENTER:
+        return;
+      default:
+    }
+
     if (target.value.length === 0) {
       this._closeMenu();
-      return;
+    } else {
+      this._getPredictions();
     }
-    //user entered input text, get predictions.
-    this._getPredictions();
   };
 
   Autocomplete.prototype._onInputFocus = function() {
@@ -338,8 +351,12 @@ var Autocomplete = (function() {
   };
 
   Autocomplete.prototype.emit = function(event) {
-    var args = Array.prototype.slice.call(arguments, 1);
+    var args = [];
     var callbacks = this._eventCallbacks[event];
+
+    for(var z = 1; z < arguments.length; z++) {
+      args.push(arguments[z]);
+    }
 
     if (callbacks) {
       callbacks = callbacks.slice(0);

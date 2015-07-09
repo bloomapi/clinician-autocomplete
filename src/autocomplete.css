@@ -11,6 +11,8 @@
 }
 
 .cac-highlight {
+  background: rgb(153, 181, 144);
+  filter: alpha(opacity=50);
   background-color: rgba(153, 181, 144, 0.5);
 }
 
@@ -64,6 +66,8 @@
 .cac-cursor,
 .cac-result:hover,
 .cac-result.is-active {
+  background: rgb(153, 181, 144);
+  filter: alpha(opacity=15);
   background: rgba(153, 181, 144, 0.15);
 }
 

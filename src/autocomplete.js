@@ -413,10 +413,8 @@ var Autocomplete = (function() {
 
     if (currWinWidth !== this.winWidth || currWinHeight !== this.winHeight) {
       //probably IE8
-      if (window.innerHeight == null) {
-        //reposition menu rather than blur as IE8 calls resize more often than it actually does
-        this._openMenu();
-      } else {
+      if (window.innerHeight != null) {
+        //do nothing for IE8 as IE8 calls resize more often than it actually does
         this.input.blur();
       }
       this.winHeight = currWinHeight;

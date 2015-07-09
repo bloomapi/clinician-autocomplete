@@ -6,37 +6,6 @@
  * Copyright 2015 BloomAPI, Inc.; Licensed MIT
  */
 
-if (!Function.prototype.bind) {
-  Function.prototype.bind = function(oThis) {
-    if (typeof this !== 'function') {
-      // closest thing possible to the ECMAScript 5
-      // internal IsCallable function
-      throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
-    }
-
-    var aArgs   = Array.prototype.slice.call(arguments, 1),
-        fToBind = this,
-        fNOP    = function() {},
-        fBound  = function() {
-          return fToBind.apply(this instanceof fNOP ? this : oThis,
-                 aArgs.concat(Array.prototype.slice.call(arguments)));
-        };
-
-    fNOP.prototype = this.prototype;
-    fBound.prototype = new fNOP();
-
-    return fBound;
-  };
-}
-
-if (!Array.prototype.forEach) {
-  Array.prototype.forEach = function (fn, scope) {
-    for (var i = 0, len = this.length; i < len; ++i) {
-      fn.call(scope || this, this[i], i, this);
-    }
-  };
-}  
-
 var Autocomplete = (function() {
   'use strict';
 
@@ -56,14 +25,9 @@ var Autocomplete = (function() {
     select: 'select'
   };
 
-  var _ = (function() {
+  var fill = (function() {
 
     return {
-      isMsie: function() {
-        // from https://github.com/ded/bowser/blob/master/bowser.js
-        return (/(msie|trident)/i).test(navigator.userAgent) ?
-          navigator.userAgent.match(/(msie |rv:)(\d+(.\d+)?)/i)[2] : false;
-      },
       error: function(err) { console.log(err);},
       //shallow merge
       smerge: function(obj1, obj2) {
@@ -71,6 +35,31 @@ var Autocomplete = (function() {
         for (key in obj1) { obj3[key] = obj1[key]; }
         for (key in obj2) { obj3[key] = obj2[key]; }
         return obj3;
+      },
+      forEach: function (arr, fn, scope) {
+        for (var i = 0, len = arr.length; i < len; ++i) {
+          fn.call(scope || arr, arr[i], i, arr);
+        }
+      },
+      bind: function (oThis, sThis) {
+        if (typeof sThis !== 'function') {
+          // closest thing possible to the ECMAScript 5
+          // internal IsCallable function
+          throw new TypeError('Function.prototype.bind - what is trying to be bound is not callable');
+        }
+
+        var aArgs   = Array.prototype.slice.call(arguments, 2),
+            fToBind = sThis,
+            FNOP    = function() {},
+            fBound  = function() {
+              return fToBind.apply(sThis instanceof FNOP ? sThis : oThis,
+                     aArgs.concat(Array.prototype.slice.call(arguments)));
+            };
+
+        FNOP.prototype = sThis.prototype;
+        fBound.prototype = new FNOP();
+
+        return fBound;
       },
       isEmpty: function(obj) { 
         for(var p in obj) {
@@ -101,9 +90,6 @@ var Autocomplete = (function() {
         }
         return ret.join('&');
       },
-      forEach: function(fakeArray, cb) {
-        Array.prototype.slice.call(fakeArray).forEach(cb);
-      },
       getOffset: function (elm) {
         var x = 0, y = 0;
 
@@ -114,6 +100,24 @@ var Autocomplete = (function() {
         }
 
         return { top: y, left: x };
+      },
+      addEventListener: function (elm, event, cb) {
+        if (window.addEventListener) {
+          elm.addEventListener(event, cb, false);
+        } else if (window.attachEvent) {
+          elm.attachEvent("on" + event, cb);
+        }
+      },
+      removeEventListener: function (elm, event, cb) {
+        if (window.removeEventListener) {
+          elm.removeEventListener(event, cb, false);
+        } else if (window.detachEvent) {
+          if (event != null && event !== "") {
+            elm.detachEvent("on" + event, cb);
+          } else {
+            elm.detachEvent(null, cb);
+          }
+        }
       }
     };
   })();
@@ -138,11 +142,11 @@ var Autocomplete = (function() {
     id.className = (id.className ? id.className + ' ' + id.id : id.id);
 
     if (!id) {
-      _.error('missing input id');
+      fill.error('missing input id');
     }
 
     if(!o.apiKey) {
-      _.error('missing api key, https://www.bloomapi.com/documentation/clinician-identity/#customization');
+      fill.error('missing api key, https://www.bloomapi.com/documentation/clinician-identity/#customization');
     }
 
     var defaults = {
@@ -153,7 +157,7 @@ var Autocomplete = (function() {
       distance: 25 //miles
     };
 
-    this.options = _.smerge(defaults, o);
+    this.options = fill.smerge(defaults, o);
 
     //storing NPI data
     this.dataStore = {};
@@ -188,18 +192,16 @@ var Autocomplete = (function() {
     this._eventCallbacks = {};
     
     //User Input Events
-    if (!_.isMsie() || _.isMsie() > 8) {
-      this.input.addEventListener('keydown', this._onKeyDown.bind(this), false);
-      this.input.addEventListener('input', this._onInputChange.bind(this), false);
-      this.input.addEventListener('focus', this._onInputFocus.bind(this), false);
-      this.input.addEventListener('blur', this._onInputBlur.bind(this), false);
-      this.menu.addEventListener('click', this._onClick.bind(this), false);
+    fill.addEventListener(this.input, 'keydown', fill.bind(this, this._onKeyDown));
+    fill.addEventListener(this.input, 'focus', fill.bind(this, this._onInputFocus));
+    fill.addEventListener(this.input, 'blur', fill.bind(this, this._onInputBlur));
+    fill.addEventListener(this.menu, 'click', fill.bind(this, this._onClick));
+
+    //If probably IE8 -- 'input' event support not easily detected
+    if (window.attachEvent) {
+      fill.addEventListener(this.input, 'keyup', fill.bind(this, this._onInputChange));
     } else {
-      this.input.attachEvent('onkeydown', this._onKeyDown.bind(this));
-      this.input.attachEvent('onkeyup', this._onInputChange.bind(this));
-      this.input.attachEvent('onfocus', this._onInputFocus.bind(this));
-      this.input.attachEvent('onblur', this._onInputBlur.bind(this));
-      this.menu.attachEvent('onclick', this._onClick.bind(this));
+      fill.addEventListener(this.input, 'input', fill.bind(this, this._onInputChange));
     }
 
     //ignore zipcode if we don't get one from the server.
@@ -248,11 +250,11 @@ var Autocomplete = (function() {
 
         if (node) {
           next = (node.previousSibling && node.previousSibling.hasAttribute('data-cac-id') ? node.previousSibling : suggestions[suggestions.length - 1]);
-          _.removeClass(node, 'cac-cursor');
-          _.addClass(next, 'cac-cursor');
+          fill.removeClass(node, 'cac-cursor');
+          fill.addClass(next, 'cac-cursor');
         } else {
           //start at the end
-          _.addClass(suggestions.item(suggestions.length - 1), 'cac-cursor');
+          fill.addClass(suggestions.item(suggestions.length - 1), 'cac-cursor');
         }
         evt.preventDefault ? evt.preventDefault() : evt.returnValue = false;
         break;
@@ -262,11 +264,11 @@ var Autocomplete = (function() {
 
         if (node) {
           next = (node.nextSibling != null ? node.nextSibling : suggestions[0]);
-          _.removeClass(node, 'cac-cursor');
-          _.addClass(next, 'cac-cursor');
+          fill.removeClass(node, 'cac-cursor');
+          fill.addClass(next, 'cac-cursor');
         } else {
           //start at the beginging
-          _.addClass(suggestions.item(0), 'cac-cursor');
+          fill.addClass(suggestions.item(0), 'cac-cursor');
         }
         evt.preventDefault ? evt.preventDefault() : evt.returnValue = false;
         break;
@@ -313,14 +315,10 @@ var Autocomplete = (function() {
 
   Autocomplete.prototype._onInputFocus = function() {
     if (this._resizeHandler == null) {
-      this._resizeHandler = this._handleResize.bind(this);
+      this._resizeHandler = fill.bind(this, this._handleResize);
     }
 
-    if (window.addEventListener) {
-      window.addEventListener('resize', this._resizeHandler);
-    } else {
-      window.attachEvent('onresize', this._resizeHandler);
-    }
+    fill.addEventListener(window, 'resize', this._resizeHandler);
 
     this._getPredictions();
   };
@@ -330,15 +328,10 @@ var Autocomplete = (function() {
       return;
     }
 
-    if (window.addEventListener) {
-      window.removeEventListener('resize', this._resizeHandler);
-    } else {
-      window.detachEvent('onresize', this._resizeHandler);
-    }
-
-    setTimeout(this._closeMenu.bind(this), 200);
-
+    fill.removeEventListener(window, 'resize', this._resizeHandler);
     this._resizeHandler = null;
+
+    setTimeout(fill.bind(this, this._closeMenu), 200);
   };
 
   // Event Emitter -- inspired by Emitter https://github.com/component/emitter
@@ -419,7 +412,13 @@ var Autocomplete = (function() {
     }
 
     if (currWinWidth !== this.winWidth || currWinHeight !== this.winHeight) {
-      this.input.blur();
+      //probably IE8
+      if (window.innerHeight == null) {
+        //reposition menu rather than blur as IE8 calls resize more often than it actually does
+        this._openMenu();
+      } else {
+        this.input.blur();
+      }
       this.winHeight = currWinHeight;
       this.winWidth = currWinWidth;
     }
@@ -436,11 +435,11 @@ var Autocomplete = (function() {
     //get full NPI
     var query = this.options.bloomURI + 'sources/usgov.hhs.npi/' + npi +
                 '?secret=' + this.options.apiKey;
-    return this._getJSONP(query, onResponse.bind(this));
+    return this._getJSONP(query, fill.bind(this, onResponse));
 
     function onResponse(err, data) {
       //signal completion
-      if (err || !data || _.isEmpty(data) || !('result' in data)) {
+      if (err || !data || fill.isEmpty(data) || !('result' in data)) {
         return that.emit(cacEvents.select, evt, null);
       }
       return that.emit(cacEvents.select, evt, data.result);
@@ -454,7 +453,7 @@ var Autocomplete = (function() {
   };
 
   Autocomplete.prototype._openMenu = function() {
-    var textOffset = _.getOffset(this.input),
+    var textOffset = fill.getOffset(this.input),
         textHeight = this.input.offsetHeight;
 
     this.menu.style.display = 'block';
@@ -486,7 +485,8 @@ var Autocomplete = (function() {
     }
 
     //Add an item for each result
-    data.slice(0, this.options.limit).forEach(function(itemData) {
+    var items = data.slice(0, this.options.limit);
+    fill.forEach(items, function(itemData) {
       var frag = templateToDocumentFragment(itemTemplate);
       fillTemplate(that.classPrefix, frag, itemData);
       frag.firstChild.setAttribute(that.selectionId, itemData.npi);
@@ -513,16 +513,16 @@ var Autocomplete = (function() {
       params.zipcode = this.zipcode;
     }
 
-    query += '?' + _.encodeQueryData(params);
+    query += '?' + fill.encodeQueryData(params);
 
     window.clearTimeout(this.currentTimer);
 
     return this.currentTimer = window.setTimeout(function () {
-      that._getJSONP(query, onResponse.bind(that));
+      that._getJSONP(query, fill.bind(this, onResponse));
     }, 200);
 
     function onResponse(err, data) {
-      if (err || !data || _.isEmpty(data) || !('results' in data)) {
+      if (err || !data || fill.isEmpty(data) || !('results' in data)) {
         that._populateMenu([]);
       } else {
         that._populateMenu(data.results);
@@ -537,11 +537,11 @@ var Autocomplete = (function() {
     var that = this;
 
     var query = this.options.bloomURI + 'clinician-identity/location';
-    query += '?' + _.encodeQueryData({secret: this.options.apiKey});
-    return this._getJSONP(query, onResponse.bind(this));
+    query += '?' + fill.encodeQueryData({secret: this.options.apiKey});
+    return this._getJSONP(query, fill.bind(this, onResponse));
 
     function onResponse(err, data) {
-      if (err || !data || _.isEmpty(data) || !('result' in data) || !('zipcode' in data.result)) {
+      if (err || !data || fill.isEmpty(data) || !('result' in data) || !('zipcode' in data.result)) {
         return cb(null);
       }
       that.zipcode = data.result.zipcode;

@@ -68,12 +68,8 @@
 }
 
 .cac-dropdown-menu {
-  position: relative;
-  height: 100%;
-  top: 0px;
-  left: 0px; 
+  position: absolute;
   z-index: 100;
-  margin-bottom: 20px;
   overflow: hidden;
   background-color: #fff;
   -webkit-border-radius: 8px;

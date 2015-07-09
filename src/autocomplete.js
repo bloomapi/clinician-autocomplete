@@ -371,7 +371,7 @@ var Autocomplete = (function() {
   };
 
   Autocomplete.prototype._openMenu = function() {
-    this.menu.style.display = 'inline-block';
+    this.menu.style.display = 'block';
     this.emit(cacEvents.open);
   };
 

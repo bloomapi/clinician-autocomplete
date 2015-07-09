@@ -11,9 +11,7 @@
 }
 
 .cac-highlight {
-  background: rgb(153, 181, 144);
-  filter: alpha(opacity=50);
-  background-color: rgba(153, 181, 144, 0.5);
+  background: rgb(210, 222, 206);
 }
 
 .cac-header {
@@ -66,9 +64,7 @@
 .cac-cursor,
 .cac-result:hover,
 .cac-result.is-active {
-  background: rgb(153, 181, 144);
-  filter: alpha(opacity=15);
-  background: rgba(153, 181, 144, 0.15);
+  background: rgb(210, 222, 206);
 }
 
 .cac-dropdown-menu {

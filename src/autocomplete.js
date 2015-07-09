@@ -103,6 +103,17 @@ var Autocomplete = (function() {
       },
       forEach: function(fakeArray, cb) {
         Array.prototype.slice.call(fakeArray).forEach(cb);
+      },
+      getOffset: function (elm) {
+        var x = 0, y = 0;
+
+        while( elm && !isNaN( elm.offsetLeft ) && !isNaN( elm.offsetTop ) ) {
+          x += elm.offsetLeft - elm.scrollLeft;
+          y += elm.offsetTop - elm.scrollTop;
+          elm = elm.offsetParent;
+        }
+
+        return { top: y, left: x };
       }
     };
   })();
@@ -371,7 +382,13 @@ var Autocomplete = (function() {
   };
 
   Autocomplete.prototype._openMenu = function() {
+    var textOffset = _.getOffset(this.input),
+        textHeight = this.input.offsetHeight;
+
     this.menu.style.display = 'block';
+    this.menu.style.top = textOffset.top + textHeight + "px";
+    this.menu.style.left = textOffset.left + "px";
+
     this.emit(cacEvents.open);
   };
 

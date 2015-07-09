@@ -118,6 +118,9 @@ var Autocomplete = (function() {
     };
   })();
 
+
+
+
   // Constructor
   // ===========
   function Autocomplete(id, o) {
@@ -160,6 +163,10 @@ var Autocomplete = (function() {
     this.classPrefix = 'cac';
     this.selectionId = 'data-cac-id';
 
+    // to help reverse compat with window resizing
+    this.winHeight = window.innerHeight || document.documentElement.clientHeight;
+    this.winWidth = window.innerWidth || document.documentElement.clientWidth;
+
     // Setup
     // ====================
 
@@ -188,11 +195,15 @@ var Autocomplete = (function() {
     if (!_.isMsie() || _.isMsie() > 8) {
       this.input.addEventListener('keydown', this._onKeydown.bind(this), false);
       this.input.addEventListener('input', this._onInput.bind(this), false);
+      this.input.addEventListener('focus', this._onInputFocus.bind(this), false);
+      this.input.addEventListener('blur', this._onInputBlur.bind(this), false);
       this.menu.addEventListener('click', this._onClick.bind(this), false);
     } else {
       this.input.attachEvent('onkeydown', this._onKeydown.bind(this));
       //ie doesn't support input.
       this.input.attachEvent('onkeyup', this._onInput.bind(this));
+      this.input.attachEvent('onfocus', this._onInputFocus.bind(this));
+      this.input.attachEvent('onblur', this._onInputBlur.bind(this));
       this.menu.attachEvent('onclick', this._onClick.bind(this));
     }
 
@@ -291,6 +302,34 @@ var Autocomplete = (function() {
     this._getPredictions();
   };
 
+  Autocomplete.prototype._onInputFocus = function() {
+    if (this._resizeHandler == null) {
+      this._resizeHandler = this._handleResize.bind(this);
+    }
+
+    if (window.addEventListener) {
+      window.addEventListener('resize', this._resizeHandler);
+    } else {
+      window.attachEvent('onresize', this._resizeHandler);
+    }
+  };
+
+  Autocomplete.prototype._onInputBlur = function() {
+    if (this._resizeHandler == null) {
+      return;
+    }
+
+    if (window.addEventListener) {
+      window.removeEventListener('resize', this._resizeHandler);
+    } else {
+      window.detachEvent('onresize', this._resizeHandler);
+    }
+
+    this._closeMenu();
+
+    this._resizeHandler = null;
+  };
+
   // Event Emitter -- inspired by Emitter https://github.com/component/emitter
   // ==============
 
@@ -352,6 +391,17 @@ var Autocomplete = (function() {
 
   // Private Methods
   // ================
+
+  Autocomplete.prototype._handleResize = function() {
+    var currWinHeight = window.innerHeight || document.documentElement.clientHeight;
+    var currWinWidth = window.innerWidth || document.documentElement.clientWidth;
+
+    if (currWinWidth !== this.winWidth || currWinHeight !== this.winHeight) {
+      this.input.blur();
+      this.winHeight = currWinHeight;
+      this.winWidth = currWinWidth;
+    }
+  };
 
   Autocomplete.prototype._selectEntry = function(evt, npi) {
     var that = this;

@@ -399,10 +399,8 @@ var Autocomplete = (function() {
     var headerTemplate = '<div class="cac-header">Clinicians Near <span class="cac-zip"></span>:</div>';
     var noResultsTemplate = '<p class="no-results-message">No results found</p>';
 
-    if (that.menu.children.length !== 0) {
-      Array.prototype.slice.call(that.menu.children).forEach(function(child) {
-        that.menu.removeChild(child);
-      });
+    while(that.menu.firstChild) {
+      that.menu.removeChild(that.menu.firstChild);
     }
 
     if (data.length === 0) {

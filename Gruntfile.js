@@ -72,7 +72,7 @@ module.exports = function(grunt) {
 		  },
 		  js: {
 		    cwd: "dist/",
-		    src: "*.js",
+		    src: "*-<%= pkg.version %>*.js",
 		    dest: "assets/js/"
 		  },
 		  img: {

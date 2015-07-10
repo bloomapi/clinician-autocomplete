@@ -15,7 +15,7 @@ Get a free developer api key at [BloomAPI](https://www.bloomapi.com/signup)
 ####2. Embed Widget
 Add the autocomplete.js from our CDN (or serve it locally)
 ```html
-<script type="text/javascript" src="https://cdn.bloomapi.com/assets/js/autocomplete-0.0.2.min.js"></script>
+<script type="text/javascript" src="https://cdn.bloomapi.com/assets/js/autocomplete-0.0.3.min.js"></script>
 ```
 
 Add the text input to your application:

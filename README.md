@@ -1,11 +1,11 @@
 # Clinician Autocomplete
 
-Our widget provides rich text searching and geolocation. Pre-fill long signup forms and reduce user drop off.
+Our widget provides rich text searching and geolocation. So you can pre-fill long signup forms and reduce user drop off.
 
 ![alt text](https://github.com/bloomapi/clinician-autocomplete/raw/master/autocomplete_demo.gif "Autocomplete Demo")
 
 ## Demo
-See a demo [here](https://www.bloomapi.com/clinician-discovery-verification-demo/autocomplete-demo)
+See a demo [here](https://www.bloomapi.com/products/clinician-identity/autocomplete-demo)
 
 ## Quickstart
 

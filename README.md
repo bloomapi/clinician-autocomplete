@@ -34,3 +34,6 @@ Setup the autocomplete javascript:
   });
 ```
 
+## Documentation
+Widget documentation and Direct API documentation available [here.](https://www.bloomapi.com/documentation/clinician-identity)
+

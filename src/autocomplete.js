@@ -184,10 +184,10 @@ var Autocomplete = (function() {
 
 
     var menuTemplate = "<div class='" + this.classPrefix + "-dropdown-menu' style='display: none; width:"+that.input.clientWidth+"px; visibility: visible;'></div>";
-    var menuElm = templateToDocumentFragment(menuTemplate).children[0];
+    var menuRendered = templateToDocumentFragment(menuTemplate);
 
-    document.body.appendChild(menuElm);
-    this.menu = menuElm;
+    document.body.appendChild(menuRendered);
+    this.menu = document.body.lastChild;
 
     // Event Callbacks & Input Binding
     // ==============

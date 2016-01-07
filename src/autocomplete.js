@@ -32,8 +32,16 @@ var Autocomplete = (function() {
       //shallow merge
       smerge: function(obj1, obj2) {
         var key, obj3 = {};
-        for (key in obj1) { obj3[key] = obj1[key]; }
-        for (key in obj2) { obj3[key] = obj2[key]; }
+        for (key in obj1) {
+          if (!obj1.hasOwnProperty(key))
+            continue;
+          obj3[key] = obj1[key];
+        }
+        for (key in obj2) {
+          if (!obj2.hasOwnProperty(key))
+            continue;
+          obj3[key] = obj2[key];
+        }
         return obj3;
       },
       forEach: function (arr, fn, scope) {
@@ -66,8 +74,8 @@ var Autocomplete = (function() {
           if(obj.hasOwnProperty(p)) {
             return false;
           }
-          return true;
         }
+        return true;
       },
       addClass: function(node, mclass) {
         var classList = node.className.split(/\s/);
@@ -77,6 +85,8 @@ var Autocomplete = (function() {
       removeClass: function(node, mclass) {
         var classList = node.className.split(/\s/);
         for (var i in classList) {
+          if (!classList.hasOwnProperty(i))
+            continue;
           if (classList[i] === mclass) {
             classList.splice(i, 1);
           }
@@ -86,17 +96,19 @@ var Autocomplete = (function() {
       encodeQueryData: function(data) {
         var ret = [];
         for (var d in data) {
+          if (!data.hasOwnProperty(d))
+            continue;
           ret.push(encodeURIComponent(d) + '=' + encodeURIComponent(data[d]));
         }
         return ret.join('&');
       },
       getOffset: function (elm) {
-        var x = 0, y = 0;
+        var x = 0, y = 0, elem = elm;
 
-        while( elm && !isNaN( elm.offsetLeft ) && !isNaN( elm.offsetTop ) ) {
-          x += elm.offsetLeft - elm.scrollLeft;
-          y += elm.offsetTop - elm.scrollTop;
-          elm = elm.offsetParent;
+        while( elem && !isNaN( elem.offsetLeft ) && !isNaN( elem.offsetTop ) ) {
+          x += elem.offsetLeft - elem.scrollLeft;
+          y += elem.offsetTop - elem.scrollTop;
+          elem = elem.offsetParent;
         }
 
         return { top: y, left: x };
@@ -105,15 +117,15 @@ var Autocomplete = (function() {
         if (window.addEventListener) {
           elm.addEventListener(event, cb, false);
         } else if (window.attachEvent) {
-          elm.attachEvent("on" + event, cb);
+          elm.attachEvent('on' + event, cb);
         }
       },
       removeEventListener: function (elm, event, cb) {
         if (window.removeEventListener) {
           elm.removeEventListener(event, cb, false);
         } else if (window.detachEvent) {
-          if (event != null && event !== "") {
-            elm.detachEvent("on" + event, cb);
+          if (event != null && event !== '') {
+            elm.detachEvent('on' + event, cb);
           } else {
             elm.detachEvent(null, cb);
           }
@@ -137,7 +149,7 @@ var Autocomplete = (function() {
 
     // Options & Defaults
     // ==================
-    o = o || {};
+    var opts = o || {};
     this.input = id;
     id.className = (id.className ? id.className + ' ' + id.id : id.id);
 
@@ -145,7 +157,7 @@ var Autocomplete = (function() {
       fill.error('missing input id');
     }
 
-    if(!o.apiKey) {
+    if(!opts.apiKey) {
       fill.error('missing api key, https://www.bloomapi.com/documentation/clinician-identity/#customization');
     }
 
@@ -157,7 +169,7 @@ var Autocomplete = (function() {
       distance: 25 //miles
     };
 
-    this.options = fill.smerge(defaults, o);
+    this.options = fill.smerge(defaults, opts);
 
     //storing NPI data
     this.dataStore = {};
@@ -247,7 +259,7 @@ var Autocomplete = (function() {
         evt.preventDefault ? evt.preventDefault() : evt.returnValue = false;
         break;
       case keyCodeMap.UP:
-        node = this.menu.querySelector(".cac-cursor");
+        node = this.menu.querySelector('.cac-cursor');
         suggestions = this.menu.querySelectorAll('.cac-suggestion');
 
         if (node) {
@@ -261,7 +273,7 @@ var Autocomplete = (function() {
         evt.preventDefault ? evt.preventDefault() : evt.returnValue = false;
         break;
       case keyCodeMap.DOWN:
-        node = this.menu.querySelector(".cac-cursor");
+        node = this.menu.querySelector('.cac-cursor');
         suggestions = this.menu.querySelectorAll('.cac-suggestion');
 
         if (node) {
@@ -276,7 +288,7 @@ var Autocomplete = (function() {
         break;
       case keyCodeMap.TAB:
         // select first entry
-        node = this.menu.querySelector(".cac-suggestion");
+        node = this.menu.querySelector('.cac-suggestion');
         if (node) {
           this._selectEntry(evt, node.getAttribute('data-cac-id'));
         }
@@ -284,7 +296,7 @@ var Autocomplete = (function() {
         break;
       case keyCodeMap.ENTER:
         //select current entry
-        node = this.menu.querySelector(".cac-cursor");
+        node = this.menu.querySelector('.cac-cursor');
         if (node) {
           this._selectEntry(evt, node.getAttribute('data-cac-id'));
         }
@@ -382,11 +394,13 @@ var Autocomplete = (function() {
 
   function fillTemplate(prefix, node, data) {
     for (var key in data) {
-      var query = '.' + prefix + '-'+ key.replace(/_/, '-');
+      if (!data.hasOwnProperty(key))
+        continue;
+      var query = '.' + prefix + '-' + key.replace('_', '-');
       var r = node.querySelector(query);
 
       if(r != null) {
-        if(typeof data[key] === "object") {
+        if(typeof data[key] === 'object') {
           fillTemplate(prefix, r, data[key]);
         } else {
           if('textContent' in document.body) {
@@ -457,8 +471,8 @@ var Autocomplete = (function() {
         textHeight = this.input.offsetHeight;
 
     this.menu.style.display = 'block';
-    this.menu.style.top = textOffset.top + textHeight + "px";
-    this.menu.style.left = textOffset.left + "px";
+    this.menu.style.top = textOffset.top + textHeight + 'px';
+    this.menu.style.left = textOffset.left + 'px';
 
     this.emit(cacEvents.open);
   };
@@ -550,19 +564,19 @@ var Autocomplete = (function() {
   };
 
   Autocomplete.prototype._getJSONP = function(url, cb) {
-    var name = 'jsonp_' + Math.floor(Math.random() * Math.pow(10, 8)),
-    script;
+    var name = 'jsonp_' + Math.floor(Math.random() * Math.pow(10, 8)), script;
+    var src_url = url;
 
-    if (url.match(/\?/)) {
-      url += '&callback=' + name;
+    if (src_url.match(/\?/)) {
+      src_url += '&callback=' + name;
     } else {
-      url += '?callback=' + name;
+      src_url += '?callback=' + name;
     }
     
     script = document.createElement('script');
     script.type = 'text/javascript';
-    script.src = url;
-    
+    script.src = src_url;
+
     // Setup handler
     window[name] = function (data) {
       cb.call(window, null, data);
@@ -576,7 +590,7 @@ var Autocomplete = (function() {
     };
 
     // Load JSON
-    document.getElementsByTagName("head")[0].appendChild(script);
+    document.getElementsByTagName('head')[0].appendChild(script);
   };
 
   return Autocomplete;
